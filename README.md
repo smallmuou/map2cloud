@@ -1,4 +1,6 @@
 # map2cloud - 映射本地端口至云端
+2017.9.13
+开源工具
 
 >很多时候，我们需要远程访问本地的服务，一般我们是借助于Teamviewer或者花生壳，而这往往需要人在对方电脑旁，还有一点，无法真正做到本机操作，体验比较差；而借助该工具就可以直接将远端服务映射到云端，我们只需要访问云端对应端口就能访问远程服务。
 
@@ -24,8 +26,8 @@ apt-get install autossh
 
 #### 2. 安装map2cloud
 ```bash
-sudo curl https://raw.githubusercontent.com/smallmuou/map2cloud/master/map2cloud > /usr/local/bin
-sudo chmod +x /usr/local/bin
+sudo curl https://raw.githubusercontent.com/smallmuou/map2cloud/master/map2cloud > /usr/local/bin/map2cloud
+sudo chmod +x /usr/local/bin/map2cloud
 ```
 
 #### 3. 生成rsa密钥
