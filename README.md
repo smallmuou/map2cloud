@@ -41,15 +41,14 @@ PS: 一路Enter就行，会在$Home/.ssh/下生成id_rsa和id_rsa.pub
 #### 4. 开启云端sshd的GatewayPorts功能
 默认情况sshd是不开启GatewayPorts，这样无法外部访问.
 
-```
 vim /etc/ssh/sshd_config 
-
-GatewayPorts yes
-
-保存退出后，重启sshd
-
-service sshd restart
 ```
+...
+GatewayPorts yes
+...
+
+```
+保存退出后，重启sshd `service sshd restart`
 
 ### 使用
 
