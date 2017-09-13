@@ -86,7 +86,7 @@ OPTIONS:
     -h              Show this help message and exit.
     -i              Assign ssh private key path.
     -p              Assign ssh port.
-    -n              Assign name of the service name.
+    -n              Assign name of the service.
 
 EXAMPLES:
     map2cloud root@120.24.18.12 22 22222

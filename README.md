@@ -67,7 +67,7 @@ OPTIONS:
     -h              Show this help message and exit.
     -i              Assign ssh private key path.
     -p              Assign ssh port.
-    -n              Assign name of the service name.
+    -n              Assign name of the service.
 ```
 
 参数说明：
