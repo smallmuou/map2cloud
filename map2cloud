@@ -162,6 +162,9 @@ cat << EOF > $file
 # chkconfig: - 85 15
 # description: map2cloud is a tool which map local port to cloud.
 
+PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin
+export PATH
+
 initdir=/etc/init.d
 prog=$service_name
 server=$ssh_server
