@@ -80,8 +80,9 @@ OPTIONS:
 
 选项：
 
--i 指定ssh私钥路径
--n 指定本地服务名字，默认r-端口
+* -i 指定ssh私钥路径
+* -p 指定云端sshd端口，默认22
+* -n 指定本地服务名字，默认r-端口
 
 可以通过`map2cloud -h`查看详细的帮助
 
@@ -92,9 +93,11 @@ OPTIONS:
 ```bash
 map2cloud -i /root/.ssh/id_rsa -p 22 -n rssh root@your-cloud-ip 22 22222
 ```
+PS：这样我执行要执行`ssh -p 22222 user@your-cloud-ip`，就可以访问本地主机
+
 
 映射192.168.12.100端口80至云端10080
 ```bash
 map2cloud -n rhttp root@your-cloud-ip 192.168.12.100:80 10080
 ```
-
+PS: 只需在浏览器下输入http://your-cloud-ip:10080，就可以访问本地服务
