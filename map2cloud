@@ -141,7 +141,7 @@ local_parse() {
     fi
 }
 
-local_parse ${2/\// }
+local_parse ${2/:/ }
 [ -z "$service_name" ] && service_name=r-$local_port
 cloud_port=$3
 
