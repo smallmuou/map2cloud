@@ -74,6 +74,8 @@ cat << EOF
 USAGE: `basename $0` [OPTIONS] ssh-user@cloud-ip [local-ip:]local-port cloud-port 
 
 DESCRIPTION:
+    .
+
     ssh-user        The ssh user to access to cloud server.
     cloud-ip        The cloud server ip or domain.
     local-ip        The local ip to map, default is localhost.
@@ -85,6 +87,10 @@ OPTIONS:
     -i              Assign ssh private key path.
     -p              Assign ssh port.
     -n              Assign name of the service name.
+
+EXAMPLES:
+    map2cloud root@120.24.18.12 22 22222
+    map2cloud root@120.24.18.12 192.168.1.100:80 10080
 
 EOF
 exit 1
