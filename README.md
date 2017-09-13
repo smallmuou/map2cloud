@@ -88,7 +88,7 @@ OPTIONS:
 
 ### 例子
 
-映射本机ssh服务端口22至云端22222
+* 映射本机ssh服务端口22至云端22222
 
 ```bash
 map2cloud -i /root/.ssh/id_rsa -p 22 -n rssh root@your-cloud-ip 22 22222
@@ -96,7 +96,7 @@ map2cloud -i /root/.ssh/id_rsa -p 22 -n rssh root@your-cloud-ip 22 22222
 PS：这样我执行要执行`ssh -p 22222 user@your-cloud-ip`，就可以访问本地主机
 
 
-映射192.168.12.100端口80至云端10080
+* 映射192.168.12.100端口80至云端10080
 ```bash
 map2cloud -n rhttp root@your-cloud-ip 192.168.12.100:80 10080
 ```
