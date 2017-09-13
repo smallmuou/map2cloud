@@ -231,7 +231,6 @@ chmod +x $file
 cmdcheck autossh
 cmdcheck wc
 cmdcheck ssh
-cmdcheck chkconfig
 cmdcheck ssh-keygen
 cmdcheck ssh-copy-id
 
@@ -252,7 +251,8 @@ info "Setup service $service_name ..."
 setup_service
 
 info "Enable $service_name startup ..."
-chkconfig --add $service_name
-chkconfig --level 345 $service_name on
+ln -s /etc/init.d/$service_name /etc/rc3.d/S80$service_name
+ln -s /etc/init.d/$service_name /etc/rc4.d/S80$service_name
+ln -s /etc/init.d/$service_name /etc/rc5.d/S80$service_name
 
-info "Successfully. You can use command [service $service_name start/stop/restart/status] to control it."
+info "Successfully. You can use command [/etc/init.d/$service_name start/stop/restart/status] to control it."
