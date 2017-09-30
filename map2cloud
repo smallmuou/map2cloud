@@ -92,10 +92,12 @@ OPTIONS:
     -i              Assign ssh private key path.
     -p              Assign ssh port.
     -n              Assign name of the service.
+    -r              Unmap the local port.
 
 EXAMPLES:
     map2cloud root@120.24.18.12 22 22222
     map2cloud root@120.24.18.12 192.168.1.100:80 10080
+    map2cloud -r r-80
 
 EOF
 exit 1
@@ -276,13 +278,16 @@ if [ ! -f $ssh_key_path ];then
     exit -1
 fi
 
-info "Trying use ssh-copy-id to copy your ssh public key to server ..."
-ssh-copy-id -p $ssh_port -i $ssh_key_path $ssh_server 2> /dev/null
+ssh -p $ssh_port -i $ssh_key_path $ssh_server echo -n
 if [ $? -ne 0 ];then
-    error "Please copy ssh public key($ssh_key_path.pub) and append to your server authorize file(/root/.ssh/authorized_keys) manually."
-    exit -1
+    info "Trying use ssh-copy-id to copy your ssh public key to server ..."
+    ssh-copy-id -p $ssh_port -i $ssh_key_path $ssh_server 2> /dev/null
+    if [ $? -ne 0 ];then
+        error "Please copy ssh public key($ssh_key_path.pub) and append to your server authorize file(/root/.ssh/authorized_keys) manually."
+        exit -1
+    fi
+    ssh -p $ssh_port -i $ssh_key_path $ssh_server echo -n
 fi
-ssh -p $ssh_port -i $ssh_key_path $ssh_server echo 
 
 info "Setup service $service_name ..."
 setup_service
