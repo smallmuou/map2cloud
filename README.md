@@ -67,6 +67,7 @@ OPTIONS:
     -i              Assign ssh private key path.
     -p              Assign ssh port.
     -n              Assign name of the service.
+    -r              Unmap local port.
 ```
 
 参数说明：
@@ -97,8 +98,15 @@ PS：这样我执行要执行`ssh -p 22222 user@your-cloud-ip`，就可以访问
 
 
 * 映射192.168.12.100端口80至云端10080
+
 ```bash
 map2cloud -n rhttp root@your-cloud-ip 192.168.12.100:80 10080
 /etc/init.d/rhttp start
 ```
 PS: 只需在浏览器下输入http://your-cloud-ip:10080，就可以访问本地服务
+
+* 取消映射
+
+```bash
+map2cloud -r rhttp
+```
