@@ -191,7 +191,7 @@ cat << EOF > $initfile
 
 ### BEGIN INIT INFO
 # Provides: $service_name
-# Required-Start:
+# Required-Start: \$all
 # Required-Stop:
 # Default-Start: 2 3 4 5
 # Default-Stop: 0 1 6
