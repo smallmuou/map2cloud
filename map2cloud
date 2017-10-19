@@ -189,16 +189,6 @@ cat << EOF > $initfile
 # chkconfig: - $start_seq 60
 # description: map local port $local_port to cloud port $cloud_port
 
-### BEGIN INIT INFO
-# Provides: $service_name
-# Required-Start: \$all
-# Required-Stop:
-# Default-Start: 2 3 4 5
-# Default-Stop: 0 1 6
-# Short-Description: Start up the $service_name sevice
-# Description: map local port $local_port to cloud port $cloud_port
-### END INIT INFO
-
 PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin
 export PATH
 
