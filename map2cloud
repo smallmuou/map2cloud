@@ -115,9 +115,17 @@ start_seq=99
 
 [ "$os" != 'linux' ] && { error "only support linux os now."; exit -1; }
 
-teardown_service() {
-    file=/etc/init.d/$service_name
+# 是否支持systemd启动
+systemd_support=0
+if [ -d "/usr/lib/systemd/system" ];then
+    systemd_support=1
+fi
+
+teardown_initd_service() {
+    local file=/etc/init.d/$service_name
     [ ! -f $file ] && { error "Can not found service $service_name, please check it."; exit -1; }
+
+    /etc/init.d/$service_name stop
 
     rm -rf $file
     rm -rf /etc/rc3.d/S$start_seq$service_name
@@ -125,6 +133,26 @@ teardown_service() {
     rm -rf /etc/rc5.d/S$start_seq$service_name
 
     info "Teardown service $service_name successfully"
+}
+
+teardown_systemd_service() {
+    local file=/usr/lib/systemd/system/$service_name.service
+    [ ! -f $file ] && { error "Can not found service $service_name, please check it."; exit -1; }
+
+    systemctl stop $service_name
+    systemctl disable $service_name
+    rm -rf $file
+    systemctl daemon-reload
+
+    info "Teardown service $service_name successfully"
+}
+
+teardown_service() {
+    if [ $systemd_support -eq 1 ];then
+        teardown_systemd_service
+    else
+        teardown_initd_service
+    fi
 }
 
 while getopts 'hi:n:p:r:' arg; do
@@ -168,18 +196,22 @@ local_parse() {
 }
 
 local_parse ${2/:/ }
-[ -z "$service_name" ] && service_name=r-$local_port
+[ -z "$service_name" ] && service_name=r$local_port
 cloud_port=$3
 
 [ "`expr $cloud_port % 2`" != "0" ] && { error "cloud port must be an even number."; exit -1; }
 
-initfile=/etc/init.d/$service_name
+if [ $systemd_support -eq 1 ];then
+    initfile=/usr/lib/systemd/system/${service_name}.service
+else
+    initfile=/etc/init.d/$service_name
+fi
 
 #########################################
 ###            MAIN ENTRY             ###
 #########################################
 
-setup_service() {
+setup_initd_service() {
 
 cat << EOF > $initfile
 #!/bin/bash
@@ -204,7 +236,7 @@ sshport=$ssh_port
 
 start() {
     echo -n $"Starting \$prog: "
-    nohup autossh -M \$mport -N -R \$rport:\$ip:\$port \$server -p \$sshport -i \$sshkey >/dev/null 2>&1 &
+    nohup `which autossh` -M \$mport -N -R \$rport:\$ip:\$port \$server -p \$sshport -i \$sshkey >/dev/null 2>&1 &
     echo "successed"
 }
 
@@ -253,6 +285,51 @@ exit \$?
 EOF
 
 chmod +x $initfile
+
+ln -s /etc/init.d/$service_name /etc/rc3.d/S$start_seq$service_name
+ln -s /etc/init.d/$service_name /etc/rc4.d/S$start_seq$service_name
+ln -s /etc/init.d/$service_name /etc/rc5.d/S$start_seq$service_name
+
+}
+
+setup_systemd_service() {
+local server=$ssh_server
+local rport=$cloud_port
+local ip=$local_ip
+local port=$local_port
+local mport=`expr $cloud_port + 1`
+local sshkey=$ssh_key_path
+local sshport=$ssh_port
+
+cat << EOF > $initfile
+[Unit]
+Description=map local port $local_port to cloud port $cloud_port
+After=network.target remote_fs.service
+
+[Service]
+Type=simple
+ExecStart=`which nohup` `which autossh` -M $mport -N -R $rport:$ip:$port $server -p $sshport -i $sshkey >/dev/null 2>&1 &
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=on-failure
+RestartSec=42s
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable $service_name
+}
+
+setup_service() {
+    if [ $systemd_support -eq 1 ];then
+        setup_systemd_service
+        info "Successfully. You can use command [systemctl start/stop/restart/status $service_name] to control it."
+    else
+        setup_initd_service
+        info "Successfully. You can use command [/etc/init.d/$service_name start/stop/restart/status] to control it."
+    fi
 }
 
 cmdcheck autossh
@@ -282,10 +359,3 @@ fi
 
 info "Setup service $service_name ..."
 setup_service
-
-info "Enable $service_name startup ..."
-ln -s /etc/init.d/$service_name /etc/rc3.d/S$start_seq$service_name
-ln -s /etc/init.d/$service_name /etc/rc4.d/S$start_seq$service_name
-ln -s /etc/init.d/$service_name /etc/rc5.d/S$start_seq$service_name
-
-info "Successfully. You can use command [/etc/init.d/$service_name start/stop/restart/status] to control it."
