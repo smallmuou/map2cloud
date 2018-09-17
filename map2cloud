@@ -304,7 +304,7 @@ local sshport=$ssh_port
 cat << EOF > $initfile
 [Unit]
 Description=map local port $local_port to cloud port $cloud_port
-After=network.target remote_fs.service
+After=network.service remote_fs.service wireless.service
 
 [Service]
 Type=simple
