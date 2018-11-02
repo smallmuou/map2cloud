@@ -117,7 +117,7 @@ start_seq=99
 
 # 是否支持systemd启动
 systemd_support=0
-if [ -d "/usr/lib/systemd" ];then
+if [[ -d "/usr/lib/systemd" && -n "`command -v systemctl`" ]];then
     mkdir -p /usr/lib/systemd/system
     systemd_support=1
 fi
