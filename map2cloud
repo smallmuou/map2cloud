@@ -85,7 +85,7 @@ DESCRIPTION:
     cloud-ip        The cloud server ip or domain.
     local-ip        The local ip to map, default is localhost.
     local-port      The local port to map.
-    cloud-port      The port which local port to map to. note it must be an even number.
+    cloud-port      The port which local port to map to.
 
 OPTIONS:
     -h              Show this help message and exit.
@@ -199,8 +199,6 @@ local_parse() {
 local_parse ${2/:/ }
 [ -z "$service_name" ] && service_name=r$local_port
 cloud_port=$3
-
-[ "`expr $cloud_port % 2`" != "0" ] && { error "cloud port must be an even number."; exit -1; }
 
 if [ $systemd_support -eq 1 ];then
     initfile=/usr/lib/systemd/system/${service_name}.service
