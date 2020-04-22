@@ -93,6 +93,7 @@ OPTIONS:
     -p              Assign ssh port.
     -n              Assign name of the service.
     -r              Unmap the local port.
+    -s              Skip copy public key to remote, for some server limit.
 
 EXAMPLES:
     map2cloud root@120.24.18.12 22 22222
@@ -156,7 +157,8 @@ teardown_service() {
     fi
 }
 
-while getopts 'hi:n:p:r:' arg; do
+skip_copy_pubkey=0
+while getopts 'hi:n:p:r:s' arg; do
     case $arg in
         h)
             usage
@@ -174,6 +176,9 @@ while getopts 'hi:n:p:r:' arg; do
             service_name=$OPTARG
             teardown_service
             exit 0;
+            ;;
+        s)
+            skip_copy_pubkey=1
             ;;
         ?)
             usage
@@ -346,14 +351,16 @@ if [ ! -f $ssh_key_path ];then
 fi
 
 ssh -p $ssh_port -i $ssh_key_path $ssh_server echo -n
-if [ $? -ne 0 ];then
-    info "Trying use ssh-copy-id to copy your ssh public key to server ..."
-    ssh-copy-id -p $ssh_port -i $ssh_key_path $ssh_server 2> /dev/null
+if [ $skip_copy_pubkey -eq 0 ];then
     if [ $? -ne 0 ];then
-        error "Please copy ssh public key($ssh_key_path.pub) and append to your server authorize file(/root/.ssh/authorized_keys) manually."
-        exit -1
+        info "Trying use ssh-copy-id to copy your ssh public key to server ..."
+        ssh-copy-id -p $ssh_port -i $ssh_key_path $ssh_server 2> /dev/null
+        if [ $? -ne 0 ];then
+            error "Please copy ssh public key($ssh_key_path.pub) and append to your server authorize file(/root/.ssh/authorized_keys) manually. And append -s option"
+            exit -1
+        fi
+        ssh -p $ssh_port -i $ssh_key_path $ssh_server echo -n
     fi
-    ssh -p $ssh_port -i $ssh_key_path $ssh_server echo -n
 fi
 
 info "Setup service $service_name ..."
