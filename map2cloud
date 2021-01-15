@@ -34,6 +34,12 @@ info() {
      echo -e "[${green}INFO${normal}] $1"
 }
 
+warn() {
+     local yellow="\033[1;33m"
+     local normal="\033[0m"
+     echo -e "[${yellow}WARNING${normal}] $1"
+}
+
 cmdcheck() {
     command -v $1>/dev/null 2>&1 || { error >&2 "Please install command $1 first."; exit 1; }   
 }
@@ -85,7 +91,7 @@ DESCRIPTION:
     cloud-ip        The cloud server ip or domain.
     local-ip        The local ip to map, default is localhost.
     local-port      The local port to map.
-    cloud-port      The port which local port to map to.
+    cloud-port      The cloud port which local port to map to. The (cloud-port + 1) port also be use to detect heartbeat.
 
 OPTIONS:
     -h              Show this help message and exit.
@@ -334,6 +340,7 @@ setup_service() {
         setup_initd_service
         info "Successfully. You can use command [/etc/init.d/$service_name start/stop/restart/status] to control it."
     fi
+    warn "Please make sure that port $cloud_port and `expr $cloud_port + 1` in the cloud server is not used." 
 }
 
 cmdcheck autossh
@@ -350,7 +357,10 @@ if [ ! -f $ssh_key_path ];then
     exit -1
 fi
 
-ssh -p $ssh_port -i $ssh_key_path $ssh_server echo -n
+info "Trying connect to $ssh_server ..."
+result=`ssh -p $ssh_port -i $ssh_key_path $ssh_server echo -n 2>&1`
+[ -n "`echo $result|sed -n '/Connection refused/p'`" ] && { error "$result"; exit -1; }
+
 if [ $skip_copy_pubkey -eq 0 ];then
     if [ $? -ne 0 ];then
         info "Trying use ssh-copy-id to copy your ssh public key to server ..."
